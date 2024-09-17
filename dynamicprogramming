@@ -1,0 +1,50 @@
+m,n=5,5
+S=[(r,c) for r in range (m) for c in range (n)]
+A=['north', 'south', 'east', 'west']
+acount=len(A)
+terminal=[(4,4)]
+gamma=1
+
+def transition(s,a, s_next):
+    r,c=s
+    if a=='north':
+      r=r if r==0 else r-1
+    if a=='south':
+      r=r if r==4 else r+1
+    if a=='east':
+      c=c if c==4 else c+1
+    if a=='west':
+      c=c if c==0 else c-1
+    prob=1 if (r, c)==s_next else 0
+    reward = -1
+    return prob, reward  
+
+pi={s:{a:0.25 for a in A} for s in S}
+import numpy as np
+def to_numpy(v,m,n):
+   vnum=np.zeros((m,n))
+   for s in v:
+    vnum[s]=v[s]
+   return vnum  
+
+import numpy 
+theta=1e-3
+delta=theta+1
+v={s:0 for s in S}
+iter=0
+while delta>=theta:
+    iter+=1
+    v_next={s:0 for s in S}
+    delta=0
+    for s in S:
+        if s in terminal:
+            continue  
+    for a in A:
+      for s_next in S:
+        prob, reward=transition(s,a,s_next)
+        v_next[s]+=pi[s][a]*prob*(reward+gamma*v[s_next])
+        delta=max(delta, abs(v_next[s]-v[s])) 
+    v=v_next.copy()
+v={s:np.round(v[s]) for s in S}    
+print('iter')
+to_numpy(v,m,n)
